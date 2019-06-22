@@ -1,3 +1,11 @@
+/************************************************
+*    Title: Feasibility Tests			*
+*    Original Author: Sam Siewert		*
+*    Modified by: Sarah Stephany 		*
+*    Date: 06/2019				*
+*    Code version: 2.0				*
+************************************************/
+
 #include <math.h>
 #include <stdio.h>
 
