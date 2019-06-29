@@ -1,3 +1,11 @@
+/************************************************
+*    Title: Pthreads                			*
+*    Original Author: Sam Siewert	        	*
+*    Modified by: Sarah Stephany 		        *
+*    Date: 06/2019			                	*
+*    Code version: 2.0				            *
+************************************************/
+
 // needed for CPU_ZERO, CPU_SET, CPU_COUNT
 #define _GNU_SOURCE
 
