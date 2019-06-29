@@ -21,6 +21,7 @@ typedef struct
 
 // global start time
 double start_time;
+int testabort = 0;
 
 // semaphores for 10 msec and 20 msec
 sem_t semT10;
@@ -75,9 +76,15 @@ void *Fib10(void *threadp)
     printf("%d cycles needed for fib10\n", cycles_needed);
 
     // run thread
-    while(i < 10)
+    while(!testabort)
     {
         sem_wait(&semT10);
+
+        if(testabort)
+        {
+            break;
+        }
+        
         core = sched_getcpu();
         i++;
         clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -86,16 +93,19 @@ void *Fib10(void *threadp)
         syslog(LOG_INFO, "test start time for Fib10 loop");    
         printf("F10 start time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
         
-        if(count < cycles_needed)
+        do
         {
             Fibonacci_Test(10, 100);
-            clock_gettime(CLOCK_MONOTONIC, &finish);
-            ms = ((finish.tv_sec)*1000.0) + ((finish.tv_nsec) / 1.0e6);
-            end_time = ms;       
-            syslog(LOG_INFO, "test end time for Fib10 loop");                 
-            printf("F10 completion time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
             count++;
         }
+        while(count < cycles_needed);
+
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+        ms = ((finish.tv_sec)*1000.0) + ((finish.tv_nsec) / 1.0e6);
+        end_time = ms;       
+        syslog(LOG_INFO, "test end time for Fib10 loop");                 
+        printf("F10 completion time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
+
         count = 0;
         pthread_join(threads[1], NULL);
     }
@@ -128,9 +138,15 @@ void *Fib20(void *threadp)
     printf("%d cycles needed for fib20\n", cycles_needed);
 
     // run thread
-    while(i < 10)
+    while(!testabort)
     {
         sem_wait(&semT20);
+
+        if(testabort)
+        {
+            break;
+        }
+
         core = sched_getcpu();
         i++;
         clock_gettime(CLOCK_MONOTONIC, &finish);
@@ -139,16 +155,19 @@ void *Fib20(void *threadp)
         syslog(LOG_INFO, "F20 start time in run thread");              
         printf("F20 start time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
 
-        if(count < cycles_needed)
+        do
         {
             Fibonacci_Test(10, 100);
-            clock_gettime(CLOCK_MONOTONIC, &finish);
-            ms = ((finish.tv_sec)*1000.0) + ((finish.tv_nsec) / 1.0e6);
-            end_time = ms;  
-            syslog(LOG_INFO, "F20 completion time in run thread");          
-            printf("F20 completion time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
             count++;
         }
+        while(count < cycles_needed);
+
+        clock_gettime(CLOCK_MONOTONIC, &finish);
+        ms = ((finish.tv_sec)*1000.0) + ((finish.tv_nsec) / 1.0e6);
+        end_time = ms;  
+        syslog(LOG_INFO, "F20 completion time in run thread");          
+        printf("F20 completion time #%d = %lf.  Core %d used.\n", i, (end_time - start_time), core);
+
         count = 0;
         pthread_join(threads[2], NULL);
     }
@@ -167,7 +186,7 @@ void *sequencer(void *threadp)
     start_time = ms;    
     syslog(LOG_INFO, "system start time");
 
-    if(i < 3)
+    do
     {
         printf("\nStart sequencer: T1=20, C1=10, T2=50, C2=20, U=0.9, LCM=100\n");
         
@@ -228,6 +247,13 @@ void *sequencer(void *threadp)
 
         i++;
     }
+    while(i < NUM_THREADS);
+
+    // end
+    testabort = 1;
+
+    sem_post(&semT10);
+    sem_post(&semT20);
 }
 
 void print_scheduler(void)
@@ -355,7 +381,6 @@ int main (int argc, char *argv[])
 
     for(i=0; i < NUM_THREADS; i++)
     {
-        printf("\nSeeing if it reaches here\n");
         pthread_join(threads[i], NULL);
     }
 
