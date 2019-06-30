@@ -363,7 +363,7 @@ int main (int argc, char *argv[])
     for(i=0; i < NUM_THREADS; i++)
     {
         CPU_ZERO(&threadcpu);
-        CPU_SET(3, &threadcpu);
+        CPU_SET(i, &threadcpu);
 
         rc = pthread_attr_init(&rt_sched_attr[i]);
         rc = pthread_attr_setinheritsched(&rt_sched_attr[i], PTHREAD_EXPLICIT_SCHED);
