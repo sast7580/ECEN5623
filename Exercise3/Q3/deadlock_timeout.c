@@ -1,9 +1,9 @@
 /************************************************
-*    Title: deadlock_timeout           			    *
-*    Original Author: Sam Siewert   	        	*
-*    Modified by: Sarah Stephany 		            *
-*    Date: 07/2019			                      	*
-*    Code version: 2.0				                  *
+*    Title: deadlock_timeout           			*
+*    Original Author: Sam Siewert   	        *
+*    Modified by: Sarah Stephany 		        *
+*    Date: 07/2019			                    *
+*    Code version: 2.0				            *
 ************************************************/
 
 #include <pthread.h>
@@ -155,7 +155,7 @@ void *grabRsrcs(void *threadp)
          syslog(3, "Thread 2 TIMEOUT ERROR");
          rsrcBCnt--;
          pthread_mutex_unlock(&rsrcB);
-         pthread_exit(NULL);
+         //pthread_exit(NULL);
      }
      else
      {
